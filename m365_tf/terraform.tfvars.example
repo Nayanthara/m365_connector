@@ -1,0 +1,29 @@
+# Google Cloud Settings
+project_id              = "my-gcp-project-id"
+location                = "global"
+data_store_id           = "ms-365-datastore"
+data_store_display_name = "Microsoft 365"
+
+# Microsoft Entra Settings
+entra_app_display_name   = "Google Vertex AI Search M365 Connector"
+client_secret_valid_days = 365
+
+# Cloud Environments
+o365_environment_type  = "com"             # "com" (Standard) or "us" (US Government)
+o365_cloud_environment = "Standard / GCC"  # "Standard / GCC", "GCC High", or "DoD"
+
+# Granular Scope Toggles (Read vs Action)
+enable_users_groups_read          = true
+enable_users_groups_actions       = false
+
+enable_sharepoint_onedrive_read    = true
+enable_sharepoint_onedrive_actions = false
+
+enable_outlook_read               = true
+enable_outlook_actions            = false
+
+enable_teams_read                 = true
+enable_teams_actions              = false
+
+# Secret Manager Settings
+secret_name = "discovery-engine-msft-credentials"

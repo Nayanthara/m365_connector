@@ -29,13 +29,44 @@ This Terraform module automates the setup of the **Microsoft 365 Connector** for
    - Outputs the generated client ID, client secret, and secret IDs.
    - Generates the exact `microsoft_consent_verification_url` so an administrator can grant consent with a single click.
 
+## Prerequisites & Authentication
+
+### 1. Google Cloud Authentication
+Ensure you are authenticated with Google Cloud:
+```bash
+gcloud auth application-default login
+gcloud config set project <YOUR_GCP_PROJECT_ID>
+```
+
+### 2. Microsoft Entra (Azure AD) Authentication
+Terraform needs permission to register the Entra Application and Service Principal. Choose one of the following methods:
+
+#### Method A: Azure CLI (Interactive)
+Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) and sign in with an account that has `Application Developer` or `Global Administrator` role in your Entra tenant:
+```bash
+az login --tenant <YOUR_TENANT_ID>
+```
+
+#### Method B: Service Principal / Environment Variables (Headless / CI - No `az` CLI required)
+If you don't have Azure CLI installed or are running in an automated pipeline, export the standard Azure credentials:
+```bash
+export ARM_TENANT_ID="<YOUR_TENANT_ID>"
+export ARM_CLIENT_ID="<YOUR_SERVICE_PRINCIPAL_CLIENT_ID>"
+export ARM_CLIENT_SECRET="<YOUR_SERVICE_PRINCIPAL_CLIENT_SECRET>"
+```
+
+Alternatively, you can provide `azure_tenant_id`, `azure_client_id`, and `azure_client_secret` directly in `terraform.tfvars`.
+
+---
+
 ## Usage
 
 ```bash
 cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your GCP project_id and desired permissions
+# Edit terraform.tfvars with your GCP project_id, azure_tenant_id, and desired permissions
 terraform init
 terraform apply
 ```
 
 After `terraform apply`, open the generated `microsoft_consent_verification_url` in your browser to sign in and grant consent, or open the Cloud Console and click **Verify Auth**.
+

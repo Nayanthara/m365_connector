@@ -1,11 +1,12 @@
 # Google Cloud Settings
 project_id              = "my-gcp-project-id"
 location                = "global"
-data_store_id           = "ms-365-datastore"
+data_store_id           = "msft-365-datastore"
 data_store_display_name = "Microsoft 365"
 
 # Microsoft Entra Settings
-entra_app_display_name   = "Google Vertex AI Search M365 Connector"
+azure_tenant_id          = "00000000-0000-0000-0000-000000000000" # Your Microsoft Entra Tenant ID (or export ARM_TENANT_ID)
+entra_app_display_name   = "GE M365 Connector"
 client_secret_valid_days = 365
 
 # Cloud Environments
@@ -26,4 +27,4 @@ enable_teams_read                 = true
 enable_teams_actions              = false
 
 # Secret Manager Settings
-secret_name = "discovery-engine-msft-credentials"
+secret_name = "ge-msft365-credentials"

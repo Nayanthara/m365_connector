@@ -20,3 +20,18 @@ terraform {
     }
   }
 }
+
+provider "google" {
+  project = var.project_id
+}
+
+provider "google-beta" {
+  project = var.project_id
+}
+
+provider "azuread" {
+  tenant_id     = var.azure_tenant_id
+  client_id     = var.azure_client_id
+  client_secret = var.azure_client_secret
+}
+

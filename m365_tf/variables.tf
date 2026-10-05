@@ -40,25 +40,6 @@ variable "data_store_display_name" {
 # Microsoft Entra (Azure AD) App Registration Variables
 ################################################################################
 
-variable "azure_tenant_id" {
-  type        = string
-  description = "The Microsoft Entra (Azure AD) Tenant ID. Optional if ARM_TENANT_ID environment variable is set or when authenticating via Azure CLI."
-  default     = null
-}
-
-variable "azure_client_id" {
-  type        = string
-  description = "The Client ID of the Service Principal used to run Terraform. Optional if using Azure CLI or ARM_CLIENT_ID environment variable."
-  default     = null
-}
-
-variable "azure_client_secret" {
-  type        = string
-  description = "The Client Secret of the Service Principal used to run Terraform. Optional if using Azure CLI or ARM_CLIENT_SECRET environment variable."
-  default     = null
-  sensitive   = true
-}
-
 variable "entra_app_display_name" {
   type        = string
   description = "Display name of the registered Microsoft Entra application."

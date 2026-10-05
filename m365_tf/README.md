@@ -39,23 +39,14 @@ gcloud config set project <YOUR_GCP_PROJECT_ID>
 ```
 
 ### 2. Microsoft Entra (Azure AD) Authentication
-Terraform needs permission to register the Entra Application and Service Principal. Choose one of the following methods:
+Terraform uses the Azure CLI to authenticate with your Microsoft Entra tenant.
 
-#### Method A: Azure CLI (Interactive)
-Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) and sign in with an account that has `Application Developer` or `Global Administrator` role in your Entra tenant:
-```bash
-az login --tenant <YOUR_TENANT_ID>
-```
-
-#### Method B: Service Principal / Environment Variables (Headless / CI - No `az` CLI required)
-If you don't have Azure CLI installed or are running in an automated pipeline, export the standard Azure credentials:
-```bash
-export ARM_TENANT_ID="<YOUR_TENANT_ID>"
-export ARM_CLIENT_ID="<YOUR_SERVICE_PRINCIPAL_CLIENT_ID>"
-export ARM_CLIENT_SECRET="<YOUR_SERVICE_PRINCIPAL_CLIENT_SECRET>"
-```
-
-Alternatively, you can provide `azure_tenant_id`, `azure_client_id`, and `azure_client_secret` directly in `terraform.tfvars`.
+1. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) if not already installed.
+2. Sign in with an account that has permissions to register applications in your Entra tenant:
+   ```bash
+   az login
+   ```
+   *(If your account belongs to multiple tenants, add `--tenant <YOUR_TENANT_ID>`)*
 
 ---
 
@@ -63,7 +54,7 @@ Alternatively, you can provide `azure_tenant_id`, `azure_client_id`, and `azure_
 
 ```bash
 cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your GCP project_id, azure_tenant_id, and desired permissions
+# Edit terraform.tfvars with your GCP project_id and desired permissions
 terraform init
 terraform apply
 ```

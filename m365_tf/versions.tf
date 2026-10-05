@@ -30,8 +30,6 @@ provider "google-beta" {
 }
 
 provider "azuread" {
-  tenant_id     = var.azure_tenant_id
-  client_id     = var.azure_client_id
-  client_secret = var.azure_client_secret
+  # Authenticates via Azure CLI (`az login`)
 }
 

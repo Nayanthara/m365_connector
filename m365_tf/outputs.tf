@@ -47,11 +47,6 @@ output "discovery_engine_service_agent" {
   value       = local.discovery_engine_service_agent
 }
 
-output "gcloud_secret_iam_grant_command" {
-  description = "gcloud CLI command to grant Secret Accessor role to the Discovery Engine service agent if IAM modification via Terraform is disabled."
-  value       = "gcloud secrets add-iam-policy-binding ${var.secret_name} --member=\"${local.discovery_engine_service_agent}\" --role=\"roles/secretmanager.secretAccessor\" --project=${var.project_id}"
-}
-
 ################################################################################
 # Verification / Consent Handoff Output
 ################################################################################

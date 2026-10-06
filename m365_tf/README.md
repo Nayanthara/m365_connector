@@ -31,12 +31,25 @@ This Terraform module automates the setup of the **Microsoft 365 Connector** for
 
 ## Prerequisites & Authentication
 
-### 1. Google Cloud Authentication
-Ensure you are authenticated with Google Cloud:
-```bash
-gcloud auth application-default login
-gcloud config set project <YOUR_GCP_PROJECT_ID>
-```
+### 1. Google Cloud Authentication & Permissions
+
+1. Authenticate with Google Cloud:
+   ```bash
+   gcloud auth application-default login
+   gcloud config set project <YOUR_GCP_PROJECT_ID>
+   ```
+
+2. **Required IAM Permissions**:
+   The principal running Terraform must have the following roles on the Google Cloud project:
+   - **Secret Manager Admin** (`roles/secretmanager.admin`): Required to create the secret and grant the `roles/secretmanager.secretAccessor` IAM policy to the Discovery Engine service agent (`secretmanager.secrets.setIamPolicy`).
+   - **Discovery Engine Admin** (`roles/discoveryengine.admin`): Required to provision and configure the Discovery Engine data store.
+
+   If you encounter a `403: Permission 'secretmanager.secrets.setIamPolicy' denied` error, have a project owner/admin grant `roles/secretmanager.admin`:
+   ```bash
+   gcloud projects add-iam-policy-binding <YOUR_GCP_PROJECT_ID> \
+     --member="user:<YOUR_EMAIL>" \
+     --role="roles/secretmanager.admin"
+   ```
 
 ### 2. Microsoft Entra (Azure AD) Authentication
 Terraform uses the Azure CLI to authenticate with your Microsoft Entra tenant.
@@ -76,13 +89,5 @@ terraform apply
 
 After `terraform apply`, open the generated `microsoft_consent_verification_url` in your browser to sign in and grant consent, or open the Cloud Console and click **Verify Auth**.
 
-> [!NOTE]
-> If your GCP identity does not have `roles/secretmanager.admin` (i.e. lacks `secretmanager.secrets.setIamPolicy`), `grant_discovery_engine_secret_access` is set to `false` by default to avoid 403 errors. You or a project administrator can optionally bind the role to the Discovery Engine service agent manually using the `gcloud_secret_iam_grant_command` output:
-> ```bash
-> gcloud secrets add-iam-policy-binding <secret_name> \
->   --member="serviceAccount:service-<PROJECT_NUMBER>@gcp-sa-discoveryengine.iam.gserviceaccount.com" \
->   --role="roles/secretmanager.secretAccessor" \
->   --project=<PROJECT_ID>
-> ```
 
 

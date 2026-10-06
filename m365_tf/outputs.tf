@@ -67,9 +67,11 @@ output "console_setup_instructions" {
     1. The Microsoft 365 Data Connector has been provisioned via setUpDataConnector with dataSource 'msft'.
     2. In the Google Cloud Console, open Vertex AI Search Data Stores:
        https://console.cloud.google.com/gen-app-builder/data-stores?project=${var.project_id}
-    3. Check your Data Store '${var.data_store_id}' (${var.data_store_display_name}).
-    4. Tenant Admin Consent / Authorization:
-       If your Microsoft Entra tenant requires explicit admin consent for the configured scopes, visit:
-       https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/oauth2/v2.0/authorize?client_id=${azuread_application.m365_connector.client_id}&response_type=code&redirect_uri=${urlencode(local.redirect_uri)}&prompt=consent&scope=${local.scopes_encoded}
+       Your Data Store '${var.data_store_id}' (${var.data_store_display_name}) is active.
+    3. Tenant Admin Consent / Authorization:
+       - If you opened the consent URL and clicked 'Accept', consent has been permanently granted in Microsoft Entra.
+       - The redirect page displaying 'Connecting your instance...' can simply be closed (it is a popup receiver meant for console popups and remains open when accessed in a direct browser tab).
+       - To verify the granted permissions in Entra ID, visit:
+         https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/CallAnApi/appId/${azuread_application.m365_connector.client_id}/isGateway~/false
   EOT
 }

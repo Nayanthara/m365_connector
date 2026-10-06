@@ -92,7 +92,7 @@ terraform apply
    - Store credentials in Secret Manager and configure Discovery Engine service agent access.
    - Clean up any old empty/indeterminate data store with the configured ID.
    - Automatically call the Discovery Engine `setUpDataConnector` API to provision the unified Microsoft 365 connector (`dataSource: "msft"`).
-2. If your Microsoft Entra tenant requires explicit admin consent for the configured scopes, visit the `microsoft_consent_verification_url` provided in the Terraform output.
+2. If your Microsoft Entra tenant requires explicit admin consent for the configured scopes, visit the `microsoft_consent_verification_url` provided in the Terraform output. (Note: After clicking 'Accept', you can safely ignore any redirect error/warning such as "Couldn't connect your data source" or "Connecting your instance..."; Microsoft Entra records the granted consent before the redirect).
 3. In Google Cloud Console, navigate to **[Gemini Enterprise Data Stores](https://console.cloud.google.com/gen-app-builder/data-stores)** to view your active Microsoft 365 data store.
 
 

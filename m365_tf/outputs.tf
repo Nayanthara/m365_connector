@@ -57,8 +57,8 @@ locals {
 }
 
 output "microsoft_consent_verification_url" {
-  description = "Official Microsoft Entra Tenant Admin Consent URL for the connector."
-  value       = "https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/adminconsent?client_id=${azuread_application.m365_connector.client_id}"
+  description = "Direct URL to grant tenant admin consent / authorize the account for the connector with the configured scopes."
+  value       = "https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/oauth2/v2.0/authorize?client_id=${azuread_application.m365_connector.client_id}&response_type=code&redirect_uri=${urlencode(local.redirect_uri)}&prompt=consent&scope=${local.scopes_encoded}"
 }
 
 output "entra_admin_consent_portal_url" {
@@ -73,9 +73,11 @@ output "console_setup_instructions" {
     2. In the Google Cloud Console, open Vertex AI Search Data Stores:
        https://console.cloud.google.com/gen-app-builder/data-stores?project=${var.project_id}
        Your Data Store '${var.data_store_id}' (${var.data_store_display_name}) is active.
-    3. Tenant Admin Consent Status:
-       - Since the API permissions show as granted in Microsoft Entra ID, admin consent is already 100% complete.
-       - You can verify the granted permissions at:
+    3. Tenant Admin Consent / Authorization:
+       - Open the consent verification URL to sign in with your Microsoft 365 administrator account and grant consent:
+         https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/oauth2/v2.0/authorize?client_id=${azuread_application.m365_connector.client_id}&response_type=code&redirect_uri=${urlencode(local.redirect_uri)}&prompt=consent&scope=${local.scopes_encoded}
+       - Note: After clicking 'Accept', you can safely ignore any redirect error/warning on the callback page (such as "Couldn't connect your data source" or "Connecting your instance..."). Microsoft Entra records the granted consent before redirecting.
+       - You can verify the granted permissions in Microsoft Entra Admin Center:
          https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/CallAnApi/appId/${azuread_application.m365_connector.client_id}/isGateway~/false
   EOT
 }

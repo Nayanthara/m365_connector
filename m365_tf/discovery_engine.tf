@@ -5,6 +5,151 @@
 
 data "google_client_config" "current" {}
 
+locals {
+  # Granular M365 action lists matching registry actions (dataSource: "msft")
+  users_groups_read_actions = var.enable_users_groups_read ? [
+    "entra_get_user",
+    "entra_list_groups",
+    "entra_list_users",
+    "get_my_profile"
+  ] : []
+
+  users_groups_action_actions = var.enable_users_groups_actions ? [
+    "entra_add_group_member",
+    "entra_add_group_owner",
+    "entra_create_group",
+    "entra_update_group"
+  ] : []
+
+  sharepoint_onedrive_read_actions = var.enable_sharepoint_onedrive_read ? [
+    "excel_get_row",
+    "excel_get_rows",
+    "excel_get_tables",
+    "excel_get_workbook",
+    "excel_get_worksheet",
+    "excel_get_worksheets",
+    "excel_list_workbooks",
+    "files_get_item_content",
+    "files_list_children",
+    "files_list_permissions",
+    "sharepoint_get_list_item",
+    "sharepoint_get_page_content",
+    "sharepoint_list_list_items",
+    "sharepoint_list_lists",
+    "sharepoint_search"
+  ] : []
+
+  sharepoint_onedrive_action_actions = var.enable_sharepoint_onedrive_actions ? [
+    "excel_add_table_column",
+    "excel_add_table_rows",
+    "excel_create_table",
+    "excel_create_worksheet",
+    "excel_update_table_row",
+    "files_check_in_document",
+    "files_check_out_document",
+    "files_copy_file",
+    "files_copy_folder",
+    "files_create_file",
+    "files_create_folder",
+    "files_create_share_link",
+    "files_discard_check_out_document",
+    "files_move_file",
+    "files_move_folder",
+    "files_rename_file",
+    "files_rename_folder",
+    "files_replace_file",
+    "files_send_share_invite",
+    "files_update_file_properties",
+    "sharepoint_create_list",
+    "sharepoint_create_list_item",
+    "sharepoint_create_page",
+    "sharepoint_update_list",
+    "sharepoint_update_list_item",
+    "sharepoint_update_page"
+  ] : []
+
+  outlook_read_actions = var.enable_outlook_read ? [
+    "outlook_find_meeting_times",
+    "outlook_get_attachment",
+    "outlook_get_event",
+    "outlook_get_message",
+    "outlook_get_schedule",
+    "outlook_list_calendar_view",
+    "outlook_list_calendars",
+    "outlook_list_contacts",
+    "outlook_list_mail_folders",
+    "outlook_list_messages",
+    "outlook_list_shared_mailbox_messages",
+    "outlook_search_email",
+    "outlook_search_events"
+  ] : []
+
+  outlook_action_actions = var.enable_outlook_actions ? [
+    "outlook_add_attachment",
+    "outlook_create_calendar",
+    "outlook_create_contact",
+    "outlook_create_draft_message",
+    "outlook_create_event",
+    "outlook_create_reply_draft",
+    "outlook_forward_message",
+    "outlook_move_message",
+    "outlook_reply_all_message",
+    "outlook_reply_message",
+    "outlook_rsvp_to_event",
+    "outlook_send_draft_message",
+    "outlook_send_mail",
+    "outlook_update_calendar",
+    "outlook_update_contact",
+    "outlook_update_event",
+    "outlook_update_message"
+  ] : []
+
+  teams_read_actions = var.enable_teams_read ? [
+    "teams_list_channel_messages",
+    "teams_list_channels",
+    "teams_list_chat_messages",
+    "teams_list_chats",
+    "teams_list_joined_teams",
+    "teams_list_message_replies",
+    "teams_list_scheduling_groups",
+    "teams_list_time_off_entries",
+    "teams_list_time_off_reasons",
+    "teams_search_messages"
+  ] : []
+
+  teams_action_actions = var.enable_teams_actions ? [
+    "teams_add_channel_member",
+    "teams_create_channel",
+    "teams_create_chat",
+    "teams_create_meeting",
+    "teams_create_scheduling_group",
+    "teams_create_time_off_entry",
+    "teams_create_time_off_reason",
+    "teams_reply_to_channel_message",
+    "teams_send_channel_message",
+    "teams_send_chat_message",
+    "teams_update_channel",
+    "teams_update_channel_message",
+    "teams_update_chat",
+    "teams_update_chat_message",
+    "teams_update_scheduling_group",
+    "teams_update_team",
+    "teams_update_time_off_entry"
+  ] : []
+
+  # Combined unique list of enabled action IDs to expose via BAP
+  selected_enabled_actions = distinct(concat(
+    local.users_groups_read_actions,
+    local.users_groups_action_actions,
+    local.sharepoint_onedrive_read_actions,
+    local.sharepoint_onedrive_action_actions,
+    local.outlook_read_actions,
+    local.outlook_action_actions,
+    local.teams_read_actions,
+    local.teams_action_actions
+  ))
+}
+
 resource "terraform_data" "setup_m365_connector" {
   input = {
     project_id            = var.project_id
@@ -20,6 +165,7 @@ resource "terraform_data" "setup_m365_connector" {
     o365_environment_type = var.o365_environment_type
     azure_host_url        = local.azure_host_url
     engine_id             = var.engine_id
+    enabled_actions       = jsonencode(local.selected_enabled_actions)
   }
 
   provisioner "local-exec" {
@@ -44,6 +190,7 @@ TENANT_ID="${self.input.tenant_id}"
 O365_ENV="${self.input.o365_environment_type}"
 AZURE_HOST_URL="${self.input.azure_host_url}"
 ENGINE_ID="${self.input.engine_id}"
+ENABLED_ACTIONS_JSON='${self.input.enabled_actions}'
 
 # 1. Clean up any existing empty/generic data store with this ID before calling setUpDataConnector
 DATASTORE_URL="https://discoveryengine.googleapis.com/v1alpha/projects/$PROJECT_ID/locations/$LOCATION/collections/$COLLECTION_ID/dataStores/$DATA_STORE_ID"
@@ -91,7 +238,8 @@ PAYLOAD=$(cat <<JSON
       "isActionConfigured": true
     },
     "bapConfig": {
-      "supportedConnectorModes": ["ACTIONS"]
+      "supportedConnectorModes": ["ACTIONS"],
+      "enabledActions": $ENABLED_ACTIONS_JSON
     },
     "refreshInterval": "7200s",
     "syncMode": "PERIODIC"

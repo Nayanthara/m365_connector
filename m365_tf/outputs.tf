@@ -47,6 +47,11 @@ output "discovery_engine_service_agent" {
   value       = local.discovery_engine_service_agent
 }
 
+output "enabled_connector_actions" {
+  description = "List of action IDs enabled on the Microsoft 365 BAP data connector."
+  value       = local.selected_enabled_actions
+}
+
 ################################################################################
 # Verification / Consent Handoff Output
 ################################################################################
@@ -72,12 +77,15 @@ output "console_setup_instructions" {
     1. The Microsoft 365 Data Connector has been provisioned via setUpDataConnector with dataSource 'msft'.
     2. In the Google Cloud Console, open Vertex AI Search Data Stores:
        https://console.cloud.google.com/gen-app-builder/data-stores?project=${var.project_id}
-       Your Data Store '${var.data_store_id}' (${var.data_store_display_name}) is active.
+       Your Data Store '${var.data_store_id}' (${var.data_store_display_name}) is active with ${length(local.selected_enabled_actions)} enabled tool actions.
     3. Tenant Admin Consent / Authorization:
        - Open the consent verification URL to sign in with your Microsoft 365 administrator account and grant consent:
          https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/oauth2/v2.0/authorize?client_id=${azuread_application.m365_connector.client_id}&response_type=code&redirect_uri=${urlencode(local.redirect_uri)}&prompt=consent&scope=${local.scopes_encoded}
        - Note: After clicking 'Accept', you can safely ignore any redirect error/warning on the callback page (such as "Couldn't connect your data source" or "Connecting your instance..."). Microsoft Entra records the granted consent before redirecting.
        - You can verify the granted permissions in Microsoft Entra Admin Center:
          https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/CallAnApi/appId/${azuread_application.m365_connector.client_id}/isGateway~/false
+    4. Enable Tools in Gemini Enterprise / Vertex AI Search App:
+       - In your Gemini Enterprise / Vertex AI Search App (e.g. Engine '${var.engine_id != "" ? var.engine_id : "<engine_id>"}'), navigate to Configurations -> Tools / Extensions / Actions.
+       - The Microsoft 365 connector tools are now registered and can be toggled on for your Assistant.
   EOT
 }

@@ -24,10 +24,11 @@ This Terraform module automates the setup of the **Microsoft 365 Connector** for
    - Creates a Google Secret Manager secret containing the structured credentials payload (`tenant_id`, `client_id`, `client_secret`, `o365_environment_type`, `azure_host_url`).
    - Grants the Discovery Engine service agent (`service-<project-number>@gcp-sa-discoveryengine.iam.gserviceaccount.com`) Secret Accessor permissions.
 
-5. **Automated Discovery Engine Data Connector Provisioning**:
+5. **Automated Discovery Engine Data Connector Provisioning & Tool Registration**:
    - Calls Discovery Engine's `setUpDataConnector` API with `dataSource: "msft"` to provision the single unified Microsoft 365 connector (supporting both `FEDERATED` and `DATA_INGESTION` modes).
+   - Dynamically registers all selected action IDs via `bapConfig.enabledActions` (up to 106 tools covering Outlook search/mail/calendar/contacts, SharePoint & OneDrive search/files/lists/excel, Teams chats/channels/messages, and Entra users/groups).
    - Automatically detects and removes any conflicting empty/generic data store with the same ID before provisioning.
-   - Optionally binds the data store to an existing Gemini Enterprise Engine (`engine_id`).
+   - Automatically binds the data store to your Gemini Enterprise Engine (`engine_id`), enabling the assistant to invoke the connector's tools.
 
 ## Prerequisites & Authentication
 
@@ -94,6 +95,7 @@ terraform apply
    - Automatically call the Discovery Engine `setUpDataConnector` API to provision the unified Microsoft 365 connector (`dataSource: "msft"`).
 2. If your Microsoft Entra tenant requires explicit admin consent for the configured scopes, visit the `microsoft_consent_verification_url` provided in the Terraform output. (Note: After clicking 'Accept', you can safely ignore any redirect error/warning such as "Couldn't connect your data source" or "Connecting your instance..."; Microsoft Entra records the granted consent before the redirect).
 3. In Google Cloud Console, navigate to **[Gemini Enterprise Data Stores](https://console.cloud.google.com/gen-app-builder/data-stores)** to view your active Microsoft 365 data store.
+4. In your Gemini Enterprise / Vertex AI Search App, go to **Configurations -> Tools / Extensions / Actions** to confirm that the Microsoft 365 tools (e.g. email, calendar, files, SharePoint search, Teams) are toggled ON for your Assistant.
 
 
 

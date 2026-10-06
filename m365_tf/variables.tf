@@ -73,7 +73,7 @@ variable "entra_app_display_name" {
 variable "auto_grant_admin_consent" {
   type        = bool
   description = "Whether to automatically grant tenant-wide admin consent for delegated permissions via Terraform (requires Global Administrator / Privileged Role Administrator)."
-  default     = false
+  default     = true
 }
 
 variable "client_secret_valid_days" {

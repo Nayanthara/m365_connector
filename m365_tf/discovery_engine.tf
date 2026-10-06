@@ -216,13 +216,16 @@ PAYLOAD=$(cat <<JSON
   "collectionDisplayName": "$DISPLAY_NAME",
   "dataConnector": {
     "dataSource": "msft",
+    "dataSourceVersion": 1,
+    "connectorSourceId": "msft",
     "connectorModes": ["FEDERATED", "ACTIONS"],
     "aclEnabled": false,
     "entities": [
       {"entityName": "enterprise_search"}
     ],
     "params": {
-      "auth_token": "placeholder"
+      "auth_token": "placeholder",
+      "o365_environment_type": "$O365_ENV"
     },
     "actionConfig": {
       "actionParams": {

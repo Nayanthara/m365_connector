@@ -52,6 +52,21 @@ output "enabled_connector_actions" {
   value       = local.selected_enabled_actions
 }
 
+output "o365_environment_type" {
+  description = "The configured Microsoft 365 Environment Type for sign-in ('com' for Standard or 'us' for US Government)."
+  value       = var.o365_environment_type
+}
+
+output "o365_cloud_environment" {
+  description = "The configured Microsoft 365 Cloud Environment for Microsoft Graph ('Standard / GCC', 'GCC High', or 'DoD')."
+  value       = var.o365_cloud_environment
+}
+
+output "azure_host_url" {
+  description = "The resolved Microsoft Graph API endpoint URL."
+  value       = local.azure_host_url
+}
+
 ################################################################################
 # Verification / Consent Handoff Output
 ################################################################################

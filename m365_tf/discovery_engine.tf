@@ -151,6 +151,20 @@ locals {
 }
 
 resource "terraform_data" "setup_m365_connector" {
+  triggers_replace = [
+    var.project_id,
+    var.location,
+    var.collection_id,
+    var.data_store_id,
+    var.data_store_display_name,
+    var.connector_mode,
+    var.o365_environment_type,
+    var.o365_cloud_environment,
+    local.azure_host_url,
+    azuread_application.m365_connector.client_id,
+    jsonencode(local.selected_enabled_actions)
+  ]
+
   input = {
     project_id            = var.project_id
     location              = var.location
@@ -224,8 +238,7 @@ PAYLOAD=$(cat <<JSON
       {"entityName": "enterprise_search"}
     ],
     "params": {
-      "auth_token": "placeholder",
-      "o365_environment_type": "$O365_ENV"
+      "auth_token": "placeholder"
     },
     "actionConfig": {
       "actionParams": {

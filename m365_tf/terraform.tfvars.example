@@ -26,4 +26,6 @@ enable_teams_read                 = true
 enable_teams_actions              = false
 
 # Secret Manager Settings
-secret_name = "ge-msft365-credentials"
+secret_name                          = "ge-msft365-credentials"
+grant_discovery_engine_secret_access = false # Set true only if your GCP role has secretmanager.secrets.setIamPolicy
+

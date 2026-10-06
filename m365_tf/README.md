@@ -41,12 +41,27 @@ gcloud config set project <YOUR_GCP_PROJECT_ID>
 ### 2. Microsoft Entra (Azure AD) Authentication
 Terraform uses the Azure CLI to authenticate with your Microsoft Entra tenant.
 
-1. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) if not already installed.
-2. Sign in with an account that has permissions to register applications in your Entra tenant:
-   ```bash
-   az login
-   ```
-   *(If your account belongs to multiple tenants, add `--tenant <YOUR_TENANT_ID>`)*
+#### A. Install Azure CLI
+If you do not have Azure CLI installed:
+- **Linux (Debian / Ubuntu / Cloudtop)**:
+  ```bash
+  curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+  ```
+- **macOS**:
+  ```bash
+  brew install azure-cli
+  ```
+- **Windows (PowerShell)**:
+  ```powershell
+  winget install Microsoft.AzureCLI
+  ```
+
+#### B. Authenticate
+Sign in using device code:
+```bash
+az login --use-device-code --allow-no-subscriptions
+```
+*(If your account belongs to multiple tenants, add `--tenant <YOUR_TENANT_ID>`)*
 
 ---
 
@@ -54,10 +69,20 @@ Terraform uses the Azure CLI to authenticate with your Microsoft Entra tenant.
 
 ```bash
 cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your GCP project_id and desired permissions
+# Edit terraform.tfvars with your GCP project_id and desired settings
 terraform init
 terraform apply
 ```
 
 After `terraform apply`, open the generated `microsoft_consent_verification_url` in your browser to sign in and grant consent, or open the Cloud Console and click **Verify Auth**.
+
+> [!NOTE]
+> If your GCP identity does not have `roles/secretmanager.admin` (i.e. lacks `secretmanager.secrets.setIamPolicy`), `grant_discovery_engine_secret_access` is set to `false` by default to avoid 403 errors. You or a project administrator can optionally bind the role to the Discovery Engine service agent manually using the `gcloud_secret_iam_grant_command` output:
+> ```bash
+> gcloud secrets add-iam-policy-binding <secret_name> \
+>   --member="serviceAccount:service-<PROJECT_NUMBER>@gcp-sa-discoveryengine.iam.gserviceaccount.com" \
+>   --role="roles/secretmanager.secretAccessor" \
+>   --project=<PROJECT_ID>
+> ```
+
 

@@ -143,3 +143,10 @@ variable "secret_name" {
   description = "Name of the Google Secret Manager secret used to store the M365 connector credentials."
   default     = "discovery-engine-msft-credentials"
 }
+
+variable "grant_discovery_engine_secret_access" {
+  type        = bool
+  description = "Whether to grant the Discovery Engine service agent Secret Accessor role on the Secret Manager secret. Default is false to avoid 403 errors when the executing identity lacks 'secretmanager.secrets.setIamPolicy' permission."
+  default     = false
+}
+

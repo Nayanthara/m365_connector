@@ -48,8 +48,10 @@ resource "google_secret_manager_secret_version" "m365_credentials_version" {
 ################################################################################
 
 resource "google_secret_manager_secret_iam_member" "discovery_engine_access" {
+  count     = var.grant_discovery_engine_secret_access ? 1 : 0
   project   = var.project_id
   secret_id = google_secret_manager_secret.m365_credentials.secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = local.discovery_engine_service_agent
 }
+

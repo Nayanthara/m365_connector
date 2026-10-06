@@ -20,15 +20,13 @@ This Terraform module automates the setup of the **Microsoft 365 Connector** for
    - `o365_environment_type`: `"com"` (`login.microsoftonline.com`) or `"us"` (`login.microsoftonline.us`).
    - `o365_cloud_environment`: `"Standard / GCC"` (`https://graph.microsoft.com`), `"GCC High"` (`https://graph.microsoft.us`), or `"DoD"` (`https://dod-graph.microsoft.us`).
 
-4. **Google Cloud Infrastructure & Automated Connector Provisioning**:
+4. **Google Secret Manager Credential Vaulting**:
    - Creates a Google Secret Manager secret containing the structured credentials payload (`tenant_id`, `client_id`, `client_secret`, `o365_environment_type`, `azure_host_url`).
-   - Automatically provisions the 3P Data Connector (`sharepoint`, `onedrive`, `outlook`, `teams`, or `custom_mcp`) in Discovery Engine via the official `setUpDataConnector` REST API.
-   - Automatically cleans up any conflicting empty/generic data stores with the same ID before provisioning.
-   - Optionally binds the newly provisioned connector data store to your Gemini Enterprise search engine (`engine_id`).
+   - Grants the Discovery Engine service agent (`service-<project-number>@gcp-sa-discoveryengine.iam.gserviceaccount.com`) Secret Accessor permissions.
 
-5. **Seamless Handoff Outputs**:
-   - Outputs the generated client ID, client secret, and secret IDs.
-   - Generates the exact `microsoft_consent_verification_url` so an administrator can grant consent with a single click.
+5. **Console Handoff Outputs**:
+   - Outputs the generated `Tenant ID`, `Client ID`, and `Client Secret`.
+   - Outputs step-by-step instructions to create the Microsoft 365 connector in Google Cloud Console.
 
 ## Prerequisites & Authentication
 
@@ -95,12 +93,22 @@ terraform init
 terraform apply
 ```
 
-During `terraform apply`:
-1. Microsoft Entra registers the OAuth application and generates the client secret.
-2. Google Secret Manager stores the connector credentials securely.
-3. If an existing empty/generic data store with `data_store_id` exists from a previous failed run, it is automatically removed.
-4. The Discovery Engine `setUpDataConnector` API provisions the 3P connector data store directly.
-5. If `engine_id` is set, the data store is attached to your search engine.
+### Connecting to Discovery Engine in Google Cloud Console
+
+1. Run `terraform apply` to create the Entra application and store the credentials in Secret Manager.
+2. In Google Cloud Console, navigate to **[Vertex AI Search Data Stores](https://console.cloud.google.com/gen-app-builder/data-stores)**.
+3. Click **+ New data store**.
+4. Under **Third-party applications**, select **Microsoft 365**.
+5. Enter your data store details and provide the credentials from the Terraform outputs:
+   - **Tenant ID**: Run `terraform output -raw entra_tenant_id`
+   - **Client ID**: Run `terraform output -raw entra_application_id`
+   - **Client Secret**: Run `terraform output -raw entra_client_secret`
+6. Click **Verify Auth** to sign in with your Microsoft 365 administrator account.
+7. Click **Create** to initialize the data store and sync.
+
+> [!TIP]
+> If you previously created an empty generic data store with the same ID, delete it in the Cloud Console before creating the Microsoft 365 connector data store so the ID is available.
+
 
 
 

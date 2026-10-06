@@ -36,45 +36,6 @@ variable "data_store_display_name" {
   default     = "Microsoft 365"
 }
 
-variable "connector_type" {
-  type        = string
-  description = "Microsoft 365 connector type to provision: 'sharepoint', 'onedrive', 'outlook', 'teams', or 'custom_mcp'."
-  default     = "sharepoint"
-
-  validation {
-    condition     = contains(["sharepoint", "onedrive", "outlook", "teams", "custom_mcp"], var.connector_type)
-    error_message = "connector_type must be one of: 'sharepoint', 'onedrive', 'outlook', 'teams', or 'custom_mcp'."
-  }
-}
-
-variable "connector_mode" {
-  type        = string
-  description = "Connector architecture mode: 'FEDERATED' (search & actions via API) or 'DATA_INGESTION' (batch sync/crawl with ACLs)."
-  default     = "FEDERATED"
-
-  validation {
-    condition     = contains(["FEDERATED", "DATA_INGESTION"], var.connector_mode)
-    error_message = "connector_mode must be either 'FEDERATED' or 'DATA_INGESTION'."
-  }
-}
-
-variable "instance_uri" {
-  type        = string
-  description = "The SharePoint Online or OneDrive instance URL (e.g. https://acme.sharepoint.com). Required for sharepoint and onedrive connectors."
-  default     = ""
-}
-
-variable "tenant_domain" {
-  type        = string
-  description = "The tenant domain for Microsoft Teams (e.g. acme.onmicrosoft.com). Optional."
-  default     = ""
-}
-
-variable "engine_id" {
-  type        = string
-  description = "Optional Discovery Engine / Gemini Enterprise Engine ID to link the data store to."
-  default     = ""
-}
 
 ################################################################################
 # Microsoft Entra (Azure AD) App Registration Variables

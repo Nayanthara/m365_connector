@@ -62,16 +62,20 @@ output "microsoft_consent_verification_url" {
 }
 
 output "console_setup_instructions" {
-  description = "Steps to complete the one-click verification in Google Cloud Console."
+  description = "Steps to complete the Microsoft 365 Connector setup in Google Cloud Console."
   value       = <<-EOT
-    1. In the Google Cloud Console, open Vertex AI Search & Conversation / Discovery Engine:
-       https://console.cloud.google.com/gen-app-builder/engines?project=${var.project_id}
-    2. Go to 'Data stores' -> select '${var.data_store_display_name}' (ID: ${var.data_store_id}).
-    3. In Authentication Settings:
+    1. In the Google Cloud Console, open Vertex AI Search Data Stores:
+       https://console.cloud.google.com/gen-app-builder/data-stores?project=${var.project_id}
+    2. Click '+ New data store'.
+    3. Under 'Third-party applications', select 'Microsoft 365'.
+    4. Fill in the connector details:
+       - Data store display name: ${var.data_store_display_name}
+       - Data store ID: ${var.data_store_id}
        - Tenant ID: ${data.azuread_client_config.current.tenant_id}
        - Client ID: ${azuread_application.m365_connector.client_id}
-       - Client Secret: (Retrieved from Secret Manager: ${var.secret_name})
+       - Client Secret: (run `terraform output -raw entra_client_secret`)
        - Environment: ${var.o365_environment_type == "us" ? "US Government" : "Standard"}
-    4. Click 'Verify Auth' to sign in with your Microsoft 365 administrator account and grant consent.
+    5. Click 'Verify Auth' to sign in with your Microsoft 365 administrator account and grant consent.
+    6. Click 'Create' to complete the setup.
   EOT
 }

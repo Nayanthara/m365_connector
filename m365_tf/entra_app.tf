@@ -10,8 +10,14 @@ data "azuread_service_principal" "msgraph" {
 data "azuread_client_config" "current" {}
 
 locals {
-  # Standard redirect URI for Google Vertex AI Search OAuth
-  redirect_uri = "https://vertexaisearch.cloud.google.com/console/oauth/default_oauth.html"
+  # Standard redirect URIs for Google Vertex AI Search OAuth
+  redirect_uris = [
+    "https://vertexaisearch.cloud.google.com/oauth-redirect",
+    "https://vertexaisearch.cloud.google.com/console/oauth/default_oauth.html"
+  ]
+
+  # Primary redirect URI for OAuth flows
+  redirect_uri = "https://vertexaisearch.cloud.google.com/oauth-redirect"
 
   # Base delegated scopes always required by Discovery Engine OAuth
   base_scopes = [
@@ -111,7 +117,7 @@ resource "azuread_application" "m365_connector" {
   sign_in_audience = "AzureADMyOrg" # Accounts in this organizational directory only
 
   web {
-    redirect_uris = [local.redirect_uri]
+    redirect_uris = local.redirect_uris
   }
 
   required_resource_access {

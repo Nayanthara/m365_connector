@@ -1,11 +1,11 @@
-# Terraform Template for Microsoft 365 Connector (Google Cloud Discovery Engine)
+# Terraform Template for Gemini Enterprise Microsoft 365 Connector
 
-This Terraform module automates the setup of the **Microsoft 365 Connector** for Google Cloud Discovery Engine (Vertex AI Search & Enterprise Search).
+This Terraform module automates the setup of the **Microsoft 365 Connector** for Gemini Enterprise.
 
 ## What This Module Does
 
 1. **Microsoft Entra (Azure AD) App Registration**:
-   - Registers an OAuth 2.0 Web Application with redirect URI `https://vertexaisearch.cloud.google.com/console/oauth/default_oauth.html`.
+   - Registers an OAuth 2.0 Web Application with redirect URIs `https://vertexaisearch.cloud.google.com/oauth-redirect` and `https://vertexaisearch.cloud.google.com/console/oauth/default_oauth.html`.
    - Generates a secure client secret with configurable validity (`client_secret_valid_days`).
    - Automatically maps and attaches delegated Microsoft Graph API permissions based on your granular Read vs. Action toggles.
    - Creates the Enterprise Application / Service Principal in your tenant.
@@ -62,18 +62,9 @@ Because applying IAM policies to a secret requires `secretmanager.secrets.setIam
 Terraform uses the Azure CLI to authenticate with your Microsoft Entra tenant.
 
 #### A. Install Azure CLI
-If you do not have Azure CLI installed:
-- **Linux (Debian / Ubuntu / Cloudtop)**:
+If you do not have Azure CLI installed, run:
   ```bash
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-  ```
-- **macOS**:
-  ```bash
-  brew install azure-cli
-  ```
-- **Windows (PowerShell)**:
-  ```powershell
-  winget install Microsoft.AzureCLI
   ```
 
 #### B. Authenticate
@@ -95,14 +86,14 @@ terraform apply
 ```
 
 ### Automated Provisioning & Verification
- 
+
 1. Run `terraform apply`. Terraform will:
    - Register the Entra application and generate client secrets with selected scopes.
    - Store credentials in Secret Manager and configure Discovery Engine service agent access.
    - Clean up any old empty/indeterminate data store with the configured ID.
    - Automatically call the Discovery Engine `setUpDataConnector` API to provision the unified Microsoft 365 connector (`dataSource: "msft"`).
 2. If your Microsoft Entra tenant requires explicit admin consent for the configured scopes, visit the `microsoft_consent_verification_url` provided in the Terraform output.
-3. In Google Cloud Console, navigate to **[Vertex AI Search Data Stores](https://console.cloud.google.com/gen-app-builder/data-stores)** to view your active Microsoft 365 data store.
+3. In Google Cloud Console, navigate to **[Gemini Enterprise Data Stores](https://console.cloud.google.com/gen-app-builder/data-stores)** to view your active Microsoft 365 data store.
 
 
 

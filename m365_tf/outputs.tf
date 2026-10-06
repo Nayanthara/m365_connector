@@ -57,8 +57,13 @@ locals {
 }
 
 output "microsoft_consent_verification_url" {
-  description = "Direct URL to grant tenant admin consent / authorize the account for the connector with the configured scopes."
-  value       = "https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/oauth2/v2.0/authorize?client_id=${azuread_application.m365_connector.client_id}&response_type=code&redirect_uri=${urlencode(local.redirect_uri)}&prompt=consent&scope=${local.scopes_encoded}"
+  description = "Official Microsoft Entra Tenant Admin Consent URL for the connector (avoids popup redirect loops)."
+  value       = "https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/adminconsent?client_id=${azuread_application.m365_connector.client_id}"
+}
+
+output "entra_admin_consent_portal_url" {
+  description = "Direct link to the Microsoft Entra Admin Center to grant or verify admin consent in 1 click."
+  value       = "https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/CallAnApi/appId/${azuread_application.m365_connector.client_id}/isGateway~/false"
 }
 
 output "console_setup_instructions" {
@@ -68,10 +73,10 @@ output "console_setup_instructions" {
     2. In the Google Cloud Console, open Vertex AI Search Data Stores:
        https://console.cloud.google.com/gen-app-builder/data-stores?project=${var.project_id}
        Your Data Store '${var.data_store_id}' (${var.data_store_display_name}) is active.
-    3. Tenant Admin Consent / Authorization:
-       - If you opened the consent URL and clicked 'Accept', consent has been permanently granted in Microsoft Entra.
-       - The redirect page displaying 'Connecting your instance...' can simply be closed (it is a popup receiver meant for console popups and remains open when accessed in a direct browser tab).
-       - To verify the granted permissions in Entra ID, visit:
+    3. Tenant Admin Consent (choose either option to avoid getting stuck):
+       - Option A: Open the official Microsoft Admin Consent URL:
+         https://${local.auth_host}/${data.azuread_client_config.current.tenant_id}/adminconsent?client_id=${azuread_application.m365_connector.client_id}
+       - Option B: Click 'Grant admin consent for <tenant>' in Microsoft Entra Admin Center:
          https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/CallAnApi/appId/${azuread_application.m365_connector.client_id}/isGateway~/false
   EOT
 }

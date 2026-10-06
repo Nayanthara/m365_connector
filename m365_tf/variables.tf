@@ -70,6 +70,12 @@ variable "entra_app_display_name" {
   default     = "Google Vertex AI Search M365 Connector"
 }
 
+variable "auto_grant_admin_consent" {
+  type        = bool
+  description = "Whether to automatically grant tenant-wide admin consent for delegated permissions via Terraform (requires Global Administrator / Privileged Role Administrator)."
+  default     = false
+}
+
 variable "client_secret_valid_days" {
   type        = number
   description = "Number of days the Microsoft Entra client secret remains valid."

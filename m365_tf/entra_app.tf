@@ -136,6 +136,13 @@ resource "azuread_service_principal" "m365_connector" {
   app_role_assignment_required = false
 }
 
+resource "azuread_service_principal_delegated_permission_grant" "admin_consent" {
+  count                                = var.auto_grant_admin_consent ? 1 : 0
+  service_principal_object_id          = azuread_service_principal.m365_connector.object_id
+  resource_service_principal_object_id = data.azuread_service_principal.msgraph.object_id
+  claim_values                         = local.selected_delegated_permissions
+}
+
 ################################################################################
 # Client Secret
 ################################################################################

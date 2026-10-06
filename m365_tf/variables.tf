@@ -36,6 +36,29 @@ variable "data_store_display_name" {
   default     = "Microsoft 365"
 }
 
+variable "connector_mode" {
+  type        = string
+  description = "Connector architecture mode: 'FEDERATED' (default, query & actions via API) or 'DATA_INGESTION' (batch sync/crawl with ACLs)."
+  default     = "FEDERATED"
+
+  validation {
+    condition     = contains(["FEDERATED", "DATA_INGESTION"], var.connector_mode)
+    error_message = "connector_mode must be either 'FEDERATED' or 'DATA_INGESTION'."
+  }
+}
+
+variable "instance_uri" {
+  type        = string
+  description = "Optional SharePoint Online or OneDrive instance URL (e.g. https://yourtenant.sharepoint.com)."
+  default     = ""
+}
+
+variable "engine_id" {
+  type        = string
+  description = "Optional Gemini Enterprise / Discovery Engine Engine/App ID to automatically bind the data store to."
+  default     = ""
+}
+
 
 ################################################################################
 # Microsoft Entra (Azure AD) App Registration Variables

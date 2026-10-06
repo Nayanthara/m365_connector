@@ -3,6 +3,8 @@ project_id              = "my-gcp-project-id"
 location                = "global"
 data_store_id           = "msft-365-datastore"
 data_store_display_name = "Microsoft 365"
+connector_mode          = "FEDERATED" # "FEDERATED" (query + actions) or "DATA_INGESTION" (batch sync)
+
 
 # Microsoft Entra Settings
 entra_app_display_name   = "GE M365 Connector"

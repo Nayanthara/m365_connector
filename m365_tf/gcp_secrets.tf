@@ -6,17 +6,20 @@ locals {
   # Google Cloud Discovery Engine service agent identity
   discovery_engine_service_agent = "serviceAccount:service-${data.google_project.current.number}@gcp-sa-discoveryengine.iam.gserviceaccount.com"
 
+  # Resolved Microsoft Graph API host based on cloud environment
+  azure_host_url = lookup({
+    "Standard / GCC" = "https://graph.microsoft.com",
+    "GCC High"       = "https://graph.microsoft.us",
+    "DoD"            = "https://dod-graph.microsoft.us"
+  }, var.o365_cloud_environment, "https://graph.microsoft.com")
+
   # Structured credentials payload formatted for Discovery Engine M365 connector
   connector_credentials_payload = jsonencode({
     tenant_id              = data.azuread_client_config.current.tenant_id
     client_id              = azuread_application.m365_connector.client_id
     client_secret          = azuread_application_password.client_secret.value
     o365_environment_type  = var.o365_environment_type
-    azure_host_url         = lookup({
-      "Standard / GCC" = "https://graph.microsoft.com",
-      "GCC High"       = "https://graph.microsoft.us",
-      "DoD"            = "https://dod-graph.microsoft.us"
-    }, var.o365_cloud_environment, "https://graph.microsoft.com")
+    azure_host_url         = local.azure_host_url
   })
 }
 

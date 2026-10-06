@@ -63,47 +63,7 @@ if [ "$CHECK_CODE" = "200" ]; then
 fi
 
 # 2. Build M365 connector (dataSource: msft) payload
-if [ "$MODE" = "DATA_INGESTION" ]; then
-  PAYLOAD=$(cat <<JSON
-{
-  "collectionId": "$DATA_STORE_ID",
-  "collectionDisplayName": "$DISPLAY_NAME",
-  "dataConnector": {
-    "dataSource": "msft",
-    "connectorModes": ["DATA_CONNECTOR"],
-    "aclEnabled": true,
-    "entities": [
-      {"entityName": "enterprise_search"}
-    ],
-    "params": {
-      "auth_type": "OAUTH_TWO_LEGGED",
-      "client_id": "$CLIENT_ID",
-      "client_secret": "$CLIENT_SECRET",
-      "tenant_id": "$TENANT_ID",
-      "o365_environment_type": "$O365_ENV"
-    },
-    "actionConfig": {
-      "actionParams": {
-        "client_id": "$CLIENT_ID",
-        "client_secret": "$CLIENT_SECRET",
-        "tenant_id": "$TENANT_ID",
-        "o365_environment_type": "$O365_ENV",
-        "azure_host_url": "$AZURE_HOST_URL"
-      },
-      "createBapConnection": true,
-      "isActionConfigured": true
-    },
-    "bapConfig": {
-      "supportedConnectorModes": ["ACTIONS"]
-    },
-    "refreshInterval": "7200s",
-    "syncMode": "PERIODIC"
-  }
-}
-JSON
-)
-else
-  PAYLOAD=$(cat <<JSON
+PAYLOAD=$(cat <<JSON
 {
   "collectionId": "$DATA_STORE_ID",
   "collectionDisplayName": "$DISPLAY_NAME",
@@ -115,14 +75,12 @@ else
       {"entityName": "enterprise_search"}
     ],
     "params": {
-      "auth_type": "FEDERATED_CREDENTIAL",
-      "client_id": "$CLIENT_ID",
-      "client_secret": "$CLIENT_SECRET",
-      "tenant_id": "$TENANT_ID",
-      "o365_environment_type": "$O365_ENV"
+      "auth_token": "placeholder"
     },
     "actionConfig": {
       "actionParams": {
+        "auth_key": "ByoOAuth",
+        "auth_type": "OAUTH",
         "client_id": "$CLIENT_ID",
         "client_secret": "$CLIENT_SECRET",
         "tenant_id": "$TENANT_ID",
@@ -141,7 +99,6 @@ else
 }
 JSON
 )
-fi
 
 echo "Calling Discovery Engine setUpDataConnector API for M365 connector '$DATA_STORE_ID' (dataSource: msft)..."
 RESPONSE=$(curl -s -w "\n%%{http_code}" -X POST \

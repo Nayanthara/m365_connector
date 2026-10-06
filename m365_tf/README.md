@@ -101,9 +101,7 @@ terraform apply
    - Store credentials in Secret Manager and configure Discovery Engine service agent access.
    - Clean up any old empty/indeterminate data store with the configured ID.
    - Automatically call the Discovery Engine `setUpDataConnector` API to provision the unified Microsoft 365 connector (`dataSource: "msft"`).
-2. **Tenant Admin Consent**:
-   - **Option 3 (Fully Automated via Terraform)**: With `auto_grant_admin_consent = true` (default), Terraform automatically creates the `azuread_service_principal_delegated_permission_grant` resource, granting tenant-wide admin consent during `terraform apply` with zero browser interaction.
-   - **Option 2 (Official Microsoft Admin Consent URL)**: If preferred, open the `microsoft_consent_verification_url` output (`https://login.microsoftonline.com/<TENANT_ID>/adminconsent?client_id=<CLIENT_ID>`). This official admin consent endpoint grants tenant-wide consent cleanly and does not use `default_oauth.html` popup redirects.
+2. If your Microsoft Entra tenant requires explicit admin consent for the configured scopes, visit the `microsoft_consent_verification_url` provided in the Terraform output.
 3. In Google Cloud Console, navigate to **[Vertex AI Search Data Stores](https://console.cloud.google.com/gen-app-builder/data-stores)** to view your active Microsoft 365 data store.
 
 

@@ -9,7 +9,6 @@ connector_mode          = "FEDERATED" # "FEDERATED" (query + actions) or "DATA_I
 # Microsoft Entra Settings
 entra_app_display_name   = "GE M365 Connector"
 client_secret_valid_days = 365
-auto_grant_admin_consent = true  # Automatically grant tenant admin consent via Terraform (zero browser clicks)
 
 # Cloud Environments
 o365_environment_type  = "com"             # "com" (Standard) or "us" (US Government)

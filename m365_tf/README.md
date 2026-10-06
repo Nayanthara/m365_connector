@@ -31,25 +31,76 @@ This Terraform module automates the setup of the **Microsoft 365 Connector** for
 
 ## Prerequisites & Authentication
 
-### 1. Google Cloud Authentication & Permissions
+### 1. Google Cloud Authentication & Prerequisites
 
-1. Authenticate with Google Cloud:
-   ```bash
-   gcloud auth application-default login
-   gcloud config set project <YOUR_GCP_PROJECT_ID>
-   ```
+#### A. Authenticate
+```bash
+gcloud auth application-default login
+gcloud config set project <YOUR_GCP_PROJECT_ID>
+```
 
-2. **Required IAM Permissions**:
-   The principal running Terraform must have the following roles on the Google Cloud project:
-   - **Secret Manager Admin** (`roles/secretmanager.admin`): Required to create the secret and grant the `roles/secretmanager.secretAccessor` IAM policy to the Discovery Engine service agent (`secretmanager.secrets.setIamPolicy`).
-   - **Discovery Engine Admin** (`roles/discoveryengine.admin`): Required to provision and configure the Discovery Engine data store.
+#### B. Minimum Required Roles & Permissions
+The identity executing Terraform (your user account or CI/CD service account) requires the following minimum roles on the Google Cloud project:
 
-   If you encounter a `403: Permission 'secretmanager.secrets.setIamPolicy' denied` error, have a project owner/admin grant `roles/secretmanager.admin`:
-   ```bash
-   gcloud projects add-iam-policy-binding <YOUR_GCP_PROJECT_ID> \
-     --member="user:<YOUR_EMAIL>" \
-     --role="roles/secretmanager.admin"
-   ```
+| Role | Role Name | Purpose |
+|------|-----------|---------|
+| `roles/secretmanager.admin` | Secret Manager Admin | Manage the secret and set IAM policy (`secretmanager.secrets.setIamPolicy`) to grant read access to the Discovery Engine service agent. *(Note: `roles/secretmanager.secretAdmin` is insufficient as it cannot set IAM policies).* |
+| `roles/discoveryengine.admin` | Discovery Engine Admin | Provision and configure the Discovery Engine data store. |
+| `roles/browser` | Browser / Project Viewer | Read project metadata and project number. |
+
+<details>
+<summary><b>Granular Permissions</b> (for Custom IAM Roles)</summary>
+
+- **Secret Manager**:
+  - `secretmanager.secrets.create`
+  - `secretmanager.secrets.get`
+  - `secretmanager.secrets.update`
+  - `secretmanager.secrets.delete`
+  - `secretmanager.versions.add`
+  - `secretmanager.versions.get`
+  - `secretmanager.secrets.getIamPolicy`
+  - `secretmanager.secrets.setIamPolicy`
+- **Discovery Engine**:
+  - `discoveryengine.dataStores.create`
+  - `discoveryengine.dataStores.get`
+  - `discoveryengine.dataStores.update`
+  - `discoveryengine.dataStores.delete`
+- **Resource Manager**:
+  - `resourcemanager.projects.get`
+</details>
+
+#### C. Granting Permissions
+A project administrator (with Owner or Project IAM Admin role) can run the following commands to grant the necessary permissions:
+
+- **For a Service Account (e.g. CI/CD or Terraform runner)**:
+  ```bash
+  export PROJECT_ID="<YOUR_GCP_PROJECT_ID>"
+  export SA_EMAIL="<SERVICE_ACCOUNT_EMAIL>"
+
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="serviceAccount:${SA_EMAIL}" \
+    --role="roles/secretmanager.admin"
+
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="serviceAccount:${SA_EMAIL}" \
+    --role="roles/discoveryengine.admin"
+  ```
+
+- **For a User Account**:
+  ```bash
+  export PROJECT_ID="<YOUR_GCP_PROJECT_ID>"
+  export USER_EMAIL="<YOUR_EMAIL>"
+
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="user:${USER_EMAIL}" \
+    --role="roles/secretmanager.admin"
+
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="user:${USER_EMAIL}" \
+    --role="roles/discoveryengine.admin"
+  ```
+
+
 
 ### 2. Microsoft Entra (Azure AD) Authentication
 Terraform uses the Azure CLI to authenticate with your Microsoft Entra tenant.

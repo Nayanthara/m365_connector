@@ -20,10 +20,11 @@ This Terraform module automates the setup of the **Microsoft 365 Connector** for
    - `o365_environment_type`: `"com"` (`login.microsoftonline.com`) or `"us"` (`login.microsoftonline.us`).
    - `o365_cloud_environment`: `"Standard / GCC"` (`https://graph.microsoft.com`), `"GCC High"` (`https://graph.microsoft.us`), or `"DoD"` (`https://dod-graph.microsoft.us`).
 
-4. **Google Cloud Infrastructure**:
+4. **Google Cloud Infrastructure & Automated Connector Provisioning**:
    - Creates a Google Secret Manager secret containing the structured credentials payload (`tenant_id`, `client_id`, `client_secret`, `o365_environment_type`, `azure_host_url`).
-   - Grants the Discovery Engine service agent (`service-<project-number>@gcp-sa-discoveryengine.iam.gserviceaccount.com`) Secret Accessor permissions.
-   - Creates the Discovery Engine Data Store (`google_discovery_engine_data_store`) configured for Enterprise Search.
+   - Automatically provisions the 3P Data Connector (`sharepoint`, `onedrive`, `outlook`, `teams`, or `custom_mcp`) in Discovery Engine via the official `setUpDataConnector` REST API.
+   - Automatically cleans up any conflicting empty/generic data stores with the same ID before provisioning.
+   - Optionally binds the newly provisioned connector data store to your Gemini Enterprise search engine (`engine_id`).
 
 5. **Seamless Handoff Outputs**:
    - Outputs the generated client ID, client secret, and secret IDs.
@@ -94,7 +95,13 @@ terraform init
 terraform apply
 ```
 
-After `terraform apply`, open the generated `microsoft_consent_verification_url` in your browser to sign in and grant consent, or open the Cloud Console and click **Verify Auth**.
+During `terraform apply`:
+1. Microsoft Entra registers the OAuth application and generates the client secret.
+2. Google Secret Manager stores the connector credentials securely.
+3. If an existing empty/generic data store with `data_store_id` exists from a previous failed run, it is automatically removed.
+4. The Discovery Engine `setUpDataConnector` API provisions the 3P connector data store directly.
+5. If `engine_id` is set, the data store is attached to your search engine.
+
 
 
 

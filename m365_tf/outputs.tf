@@ -34,12 +34,12 @@ output "gcp_secret_id" {
 
 output "discovery_engine_data_store_id" {
   description = "The Discovery Engine data store ID."
-  value       = google_discovery_engine_data_store.m365_datastore.data_store_id
+  value       = var.data_store_id
 }
 
 output "discovery_engine_data_store_name" {
   description = "The full resource name of the Discovery Engine data store."
-  value       = google_discovery_engine_data_store.m365_datastore.name
+  value       = "projects/${var.project_id}/locations/${var.location}/collections/${var.collection_id}/dataStores/${var.data_store_id}"
 }
 
 output "discovery_engine_service_agent" {

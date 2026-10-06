@@ -4,6 +4,12 @@ location                = "global"
 data_store_id           = "msft-365-datastore"
 data_store_display_name = "Microsoft 365"
 
+# Connector Architecture & Target Settings
+connector_type = "sharepoint" # "sharepoint", "onedrive", "outlook", "teams", or "custom_mcp"
+connector_mode = "FEDERATED"  # "FEDERATED" (query + actions) or "DATA_INGESTION" (batch crawl)
+instance_uri   = "https://yourtenant.sharepoint.com" # Required for SharePoint / OneDrive
+
+
 # Microsoft Entra Settings
 entra_app_display_name   = "GE M365 Connector"
 client_secret_valid_days = 365
